@@ -1,19 +1,29 @@
-// Invisible characters put in each window's title preface. compact.css reads
+// Invisible characters put in each window's title preface. The CSS reads
 // them from the titlepreface attribute Firefox sets on the window's root.
+//   compact.css   reads the frameless markers (works with any theme)
+//   heliumfox.css reads the layout markers (HeliumFox theme only)
 const MARKERS = {
   tabs: "⁣",
   urlbar: "⁤",
   both: "⁣⁤",
 };
+const LAYOUTS = {
+  dynamic: "",          // HeliumFox default, no marker
+  classic: "⁡",
+  compact: "⁢",
+  vertical: "",         // Firefox's own vertical tabs; HeliumFox styles them
+};
 
-const DEFAULTS = { enabled: false, mode: "both" };
+const DEFAULTS = { enabled: false, mode: "both", layout: "dynamic" };
 
 async function getState() {
   return browser.storage.local.get(DEFAULTS);
 }
 
 function prefaceFor(state) {
-  return state.enabled ? (MARKERS[state.mode] ?? MARKERS.both) : "";
+  const layout = LAYOUTS[state.layout] ?? "";
+  const frameless = state.enabled ? (MARKERS[state.mode] ?? MARKERS.both) : "";
+  return layout + frameless;
 }
 
 async function applyToWindow(windowId, preface) {
@@ -67,7 +77,7 @@ browser.commands.onCommand.addListener(async (command) => {
 });
 
 browser.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && ("enabled" in changes || "mode" in changes)) {
+  if (area === "local" && ("enabled" in changes || "mode" in changes || "layout" in changes)) {
     applyToAllWindows();
   }
 });

@@ -1,11 +1,11 @@
 const INSTALL_COMMAND =
   "irm https://raw.githubusercontent.com/rs4t/firefox-compact/main/install.ps1 | iex";
 
-const DEFAULTS = { enabled: false, mode: "both" };
+const DEFAULTS = { enabled: false, mode: "both", layout: "dynamic" };
 const $ = (id) => document.getElementById(id);
 
-function isCssInstalled() {
-  return getComputedStyle($("compact-mode-probe")).getPropertyValue("--compact-mode-css").trim() !== "";
+function probeSet(id, property) {
+  return getComputedStyle($(id)).getPropertyValue(property).trim() !== "";
 }
 
 async function copy(button, text) {
@@ -26,26 +26,59 @@ async function showShortcut() {
   }
 }
 
+// Mirror the current settings in the live preview and the open/closed sections.
+function render(heliumfox) {
+  const frameless = $("enabled").checked;
+  const checked = document.querySelector('input[name="layout"]:checked');
+  // Without HeliumFox, Firefox's own layout is tabs on top, toolbar below.
+  const layout = heliumfox && checked ? checked.value : "classic";
+
+  const stage = $("stage");
+  stage.dataset.layout = layout;
+  if (frameless) stage.dataset.frameless = $("always-top").checked ? "tabs" : "both";
+  else delete stage.dataset.frameless;
+
+  $("top-reveal").classList.toggle("open", frameless);
+  $("vertical-hint").classList.toggle("open", heliumfox && layout === "vertical");
+}
+
 async function init() {
   const state = await browser.storage.local.get(DEFAULTS);
+  const heliumfox = probeSet("heliumfox-probe", "--heliumfox-css");
 
+  // Frameless mode = hide everything; "Always show the top bar" = only the tabs hide.
   $("enabled").checked = state.enabled;
+  $("always-top").checked = state.mode === "tabs";
   $("enabled").addEventListener("change", (e) => {
     browser.storage.local.set({ enabled: e.target.checked });
+    render(heliumfox);
+  });
+  $("always-top").addEventListener("change", (e) => {
+    browser.storage.local.set({ mode: e.target.checked ? "tabs" : "both" });
+    render(heliumfox);
   });
 
-  for (const radio of document.querySelectorAll('input[name="mode"]')) {
-    radio.checked = radio.value === state.mode;
-    // Picking what to hide also turns compact mode on.
-    radio.addEventListener("change", () => {
-      $("enabled").checked = true;
-      browser.storage.local.set({ mode: radio.value, enabled: true });
-    });
+  // Layout picker, only with the HeliumFox theme.
+  if (heliumfox) {
+    $("layout-section").hidden = false;
+    for (const radio of document.querySelectorAll('input[name="layout"]')) {
+      radio.checked = radio.value === state.layout;
+      radio.addEventListener("change", () => {
+        browser.storage.local.set({ layout: radio.value });
+        render(heliumfox);
+      });
+    }
   }
+
+  // First paint without transitions, so the popup opens in its current state.
+  document.documentElement.classList.add("no-motion");
+  render(heliumfox);
+  requestAnimationFrame(() => requestAnimationFrame(() =>
+    document.documentElement.classList.remove("no-motion")));
 
   showShortcut();
 
-  if (!isCssInstalled()) {
+  if (!probeSet("compact-mode-probe", "--compact-mode-css")) {
     $("setup").hidden = false;
     $("command").textContent = INSTALL_COMMAND;
     $("copy-command").addEventListener("click", (e) => copy(e.target, INSTALL_COMMAND));

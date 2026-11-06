@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Compact Mode",
-  "version": "0.1.0",
-  "description": "Zen-style compact mode for Firefox: hide the tab bar, the URL bar, or both, and bring them back by hovering the top of the window.",
+  "version": "0.2.0",
+  "description": "Frameless mode for Firefox: hide the toolbars until you hover the top of the window. With the HeliumFox theme, also picks Helium's layouts (Classic, Dynamic, Compact, Vertical).",
   "browser_specific_settings": {
     "gecko": {
       "id": "compact-mode@rs4t",

@@ -5,32 +5,91 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <!-- compact.css styles this element when the setup step is done -->
+  <!-- compact.css / heliumfox-content.css style these when they're installed -->
   <div id="compact-mode-probe" hidden></div>
+  <div id="heliumfox-probe" hidden></div>
 
-  <header>
-    <h1>Compact Mode</h1>
-    <label class="switch" title="Turn compact mode on or off">
-      <input type="checkbox" id="enabled">
-      <span class="track"></span>
+  <!-- Live preview: morphs to show the chosen layout and frameless mode -->
+  <div class="stage enter" id="stage" data-layout="classic" aria-hidden="true">
+    <div class="win">
+      <div class="tabs"><i class="tab on"></i><i class="tab"></i><i class="tab"></i></div>
+      <div class="bar"><i class="dot"></i><i class="dot"></i><i class="url"></i><i class="dot"></i></div>
+      <div class="side"><i></i><i></i><i></i><i></i></div>
+      <div class="page"><i class="line w1"></i><i class="line w2"></i><i class="line w3"></i></div>
+      <div class="edge"></div>
+    </div>
+  </div>
+
+  <!-- Layout picker: only shown when the HeliumFox theme is installed -->
+  <section id="layout-section" class="enter" hidden>
+    <h2>Layout</h2>
+    <fieldset class="seg">
+      <legend>Browser layout</legend>
+      <span class="indicator"></span>
+      <label>
+        <input type="radio" name="layout" value="classic">
+        <svg viewBox="0 0 20 14"><rect x="1" y="1" width="18" height="12" rx="2.5"/><path d="M4 4h3M8.5 4h3M4 6.5h12"/></svg>
+        <span>Classic</span>
+      </label>
+      <label>
+        <input type="radio" name="layout" value="dynamic">
+        <svg viewBox="0 0 20 14"><rect x="1" y="1" width="18" height="12" rx="2.5"/><path d="M4 4h12M4 6.5h3M8.5 6.5h3"/></svg>
+        <span>Dynamic</span>
+      </label>
+      <label>
+        <input type="radio" name="layout" value="compact">
+        <svg viewBox="0 0 20 14"><rect x="1" y="1" width="18" height="12" rx="2.5"/><path d="M4 4h6M11.5 4h2M15 4h1"/></svg>
+        <span>Compact</span>
+      </label>
+      <label>
+        <input type="radio" name="layout" value="vertical">
+        <svg viewBox="0 0 20 14"><rect x="1" y="1" width="18" height="12" rx="2.5"/><path d="M4 4h12M4 6.5h2M4 8.5h2M4 10.5h2"/></svg>
+        <span>Vertical</span>
+      </label>
+    </fieldset>
+    <div class="reveal" id="vertical-hint">
+      <div>
+        <p class="note">
+          <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4M8 4.8v.1"/></svg>
+          <span>Vertical tabs are a Firefox setting: <b>Settings → General → Browser layout → Vertical tabs</b>. HeliumFox styles them automatically.</span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card toggles enter">
+    <label class="row">
+      <svg class="icon" viewBox="0 0 16 16"><path d="M2.5 6V3.5a1 1 0 0 1 1-1H6M10 2.5h2.5a1 1 0 0 1 1 1V6M13.5 10v2.5a1 1 0 0 1-1 1H10M6 13.5H3.5a1 1 0 0 1-1-1V10"/></svg>
+      <span class="text">
+        <span class="title">Frameless mode</span>
+        <span class="sub">Hide the toolbars until you hover the top of the window</span>
+      </span>
+      <span class="switch"><input type="checkbox" id="enabled"><span class="track"></span></span>
     </label>
-  </header>
+    <div class="reveal" id="top-reveal">
+      <div>
+        <label class="row nested" id="top-row">
+          <svg class="icon" viewBox="0 0 16 16"><path d="M6 2.5h4M7 2.5v3.2L4.8 8.3h6.4L9 5.7V2.5M8 8.3v5.2"/></svg>
+          <span class="text">
+            <span class="title">Always show the top bar</span>
+            <span class="sub">Only the tab row hides</span>
+          </span>
+          <span class="switch"><input type="checkbox" id="always-top"><span class="track"></span></span>
+        </label>
+      </div>
+    </div>
+  </section>
 
-  <fieldset class="modes">
-    <legend>Hide</legend>
-    <label><input type="radio" name="mode" value="tabs"><span>Tab bar</span></label>
-    <label><input type="radio" name="mode" value="urlbar"><span>URL bar</span></label>
-    <label><input type="radio" name="mode" value="both"><span>Both</span></label>
-  </fieldset>
-
-  <p class="hint">
-    Hover the top of the window to bring them back.<br>
-    Shortcut: <kbd id="shortcut">Ctrl+Alt+C</kbd>
+  <p class="hint enter">
+    <kbd id="shortcut">Ctrl+Alt+C</kbd> toggles frameless mode
     <button id="change-shortcut" class="link" hidden>Change</button>
   </p>
 
-  <section id="setup" hidden>
-    <h2>One-time setup needed</h2>
+  <section id="setup" class="enter" hidden>
+    <h2>
+      <svg viewBox="0 0 16 16"><path d="M8 2 1.8 13h12.4L8 2zM8 6.5v3M8 11.3v.1"/></svg>
+      One-time setup needed
+    </h2>
     <p>
       Firefox only allows hiding its toolbars through a small CSS file.
       Run this in PowerShell, then fully restart Firefox:
@@ -51,6 +110,17 @@
       <button id="copy-css">Copy compact.css</button>
     </details>
   </section>
+
+  <details class="compat enter">
+    <summary>Not working with your theme?</summary>
+    <p>Frameless mode works with any theme, unless the theme itself sets these with <code>!important</code>:</p>
+    <ul>
+      <li><code>max-height</code>, <code>min-height</code> or <code>overflow</code> on <code>#TabsToolbar</code>, <code>#nav-bar</code> or <code>#PersonalToolbar</code></li>
+      <li><code>position</code> or <code>transform</code> on <code>#navigator-toolbox</code> (themes with their own auto-hiding or floating toolbars)</li>
+      <li><code>position</code> on <code>#sidebar-container</code> (vertical tabs)</li>
+    </ul>
+    <p>Also make sure <code>@import "compact.css";</code> is the <b>first</b> line of <code>userChrome.css</code>. The layout picker only appears with the <a href="https://github.com/rs4t/heliumfox" target="_blank">HeliumFox</a> theme.</p>
+  </details>
 
   <script src="popup.js"></script>
 </body>

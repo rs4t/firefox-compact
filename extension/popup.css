@@ -1,207 +1,403 @@
 :root {
   color-scheme: light dark;
   --accent: AccentColor;
-  --muted: light-dark(#5b5b66, #a6a6b0);
-  --surface: light-dark(#f0f0f4, #2b2a33);
-  --border: light-dark(#d7d7db, #3e3d47);
+  --on-accent: AccentColorText;
+  --text: light-dark(#1a1c1c, #e3e2e2);
+  --muted: light-dark(#5e6163, #a3a6a8);
+  --bg: light-dark(#ffffff, #1e2020);
+  --surface: light-dark(#f2f2f3, #262828);
+  --surface-2: light-dark(#e6e6e8, #313333);
+  --border: light-dark(#dcdcde, #363838);
+  --mock: light-dark(#c9c9cd, #4b4e4e);
+  --mock-page: light-dark(#ffffff, #151717);
+
+  /* Motion: strong curves, all UI motion under 300ms */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --morph: 280ms;
+  --quick: 200ms;
 }
 
 body {
-  width: 300px;
+  width: 340px;
   margin: 0;
   padding: 14px;
   font: message-box;
   font-size: 13px;
-  background: Canvas;
-  color: CanvasText;
+  background: var(--bg);
+  color: var(--text);
 }
 
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-h1 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
+svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 h2 {
-  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
   font-size: 13px;
   font-weight: 600;
 }
+h2 svg { width: 15px; height: 15px; }
 
-/* On/off switch */
-.switch input {
-  position: absolute;
-  opacity: 0;
-}
-
-.switch .track {
-  display: block;
-  width: 34px;
-  height: 18px;
-  border-radius: 9px;
-  background: var(--border);
-  position: relative;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.switch .track::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: white;
-  transition: translate 0.15s ease;
-}
-
-.switch input:checked + .track {
-  background: var(--accent);
-}
-
-.switch input:checked + .track::after {
-  translate: 16px 0;
-}
-
-.switch input:focus-visible + .track {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-/* Mode picker: three segmented options */
-.modes {
-  display: flex;
-  gap: 4px;
-  margin: 0;
-  padding: 3px;
-  border: none;
-  border-radius: 8px;
+.card {
+  border-radius: 12px;
   background: var(--surface);
 }
 
-.modes legend {
-  position: absolute;
-  clip-path: inset(50%);
+section, .stage, .hint, .compat { margin: 0; }
+.stage + section, section + section, section + .hint, .hint + section, * + .compat { margin-top: 12px; }
+
+/* ==========================================================================
+   Content arrives in a short stagger when the popup opens
+   ========================================================================== */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(6px); }
+}
+.enter { animation: rise 260ms var(--ease-out) both; }
+#layout-section.enter { animation-delay: 45ms; }
+.toggles.enter { animation-delay: 90ms; }
+.hint.enter { animation-delay: 135ms; }
+#setup.enter, .compat.enter { animation-delay: 160ms; }
+
+/* ==========================================================================
+   Live preview: one little window whose parts glide into each layout
+   ========================================================================== */
+.stage {
+  height: 116px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--surface);
 }
 
-.modes label {
+.win {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: light-dark(#ececee, #232525);
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.win > div {
+  position: absolute;
+  transition:
+    transform var(--morph) var(--ease-in-out),
+    opacity var(--morph) var(--ease-in-out),
+    border-radius var(--morph) var(--ease-in-out);
+}
+
+.win i { display: block; background: var(--mock); border-radius: 3px; }
+
+/* Tab strip */
+.tabs { left: 8px; top: 7px; display: flex; gap: 4px; transition-delay: 0ms; }
+.tab { width: 38px; height: 9px; transition: background-color var(--morph) ease; }
+.tab.on { background: color-mix(in srgb, var(--accent) 70%, var(--mock)); }
+
+/* Toolbar: two buttons, the address bar, a menu button */
+.bar { left: 8px; right: 8px; top: 7px; height: 9px; display: flex; gap: 5px; align-items: center; transition-delay: 30ms; }
+.bar .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.bar .url {
   flex: 1;
+  height: 9px;
+  border-radius: 5px;
+  transition: clip-path var(--morph) var(--ease-in-out);
+  clip-path: inset(0 0 0 0 round 5px);
 }
 
-.modes input {
-  position: absolute;
-  opacity: 0;
-}
+/* Vertical tab list */
+.side { left: 7px; top: 22px; width: 34px; display: grid; gap: 4px; opacity: 0; transform: translateX(-10px); transition-delay: 30ms; }
+.side i { height: 7px; }
+.side i:first-child { background: color-mix(in srgb, var(--accent) 70%, var(--mock)); }
 
-.modes span {
-  display: block;
-  padding: 6px 0;
+/* The web page */
+.page {
+  left: 6px; right: 6px; top: 22px; height: 120px;
+  padding: 9px 10px;
+  display: grid;
+  gap: 5px;
+  align-content: start;
   border-radius: 6px;
-  text-align: center;
+  background: var(--mock-page);
+  box-shadow: 0 0 0 1px var(--border);
+  transition-delay: 60ms;
+}
+.page .line { height: 5px; border-radius: 3px; background: light-dark(#e3e3e6, #2c2e2e); }
+.w1 { width: 62%; } .w2 { width: 84%; } .w3 { width: 40%; }
+
+/* Hover strip shown in frameless mode */
+.edge {
+  left: 30%; right: 30%; top: 2px; height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transform: scaleX(0.6);
+}
+
+/* ---------- Layouts ---------- */
+.stage[data-layout="classic"]  .bar  { transform: translateY(16px); }
+.stage[data-layout="classic"]  .page { transform: translateY(17px); }
+
+.stage[data-layout="dynamic"]  .tabs { transform: translateY(16px); }
+.stage[data-layout="dynamic"]  .page { transform: translateY(17px); }
+
+.stage[data-layout="compact"]  .tabs { transform: translateX(150px); }
+.stage[data-layout="compact"]  .bar .url { clip-path: inset(0 58% 0 0 round 5px); }
+
+.stage[data-layout="vertical"] .tabs { opacity: 0; transform: translateY(-6px); }
+.stage[data-layout="vertical"] .side { opacity: 1; transform: none; }
+.stage[data-layout="vertical"] .page { transform: translateX(40px); }
+
+/* ---------- Frameless: toolbars glide away, the page takes the window ---------- */
+.stage[data-frameless] .edge { opacity: 1; transform: none; }
+.stage[data-frameless="both"] :is(.tabs, .bar) { opacity: 0; transform: translateY(-22px); }
+.stage[data-frameless="both"] .page { transform: translateY(-16px); border-radius: 0; }
+.stage[data-frameless="both"][data-layout="vertical"] .side { opacity: 0; transform: translateX(-12px); }
+.stage[data-frameless="both"][data-layout="vertical"] .page { transform: translateY(-16px); }
+
+/* "Always show the top bar": only the tabs leave */
+.stage[data-frameless="tabs"] .tabs { opacity: 0; transform: translateY(-14px); }
+.stage[data-frameless="tabs"]:is([data-layout="classic"], [data-layout="dynamic"]) .bar { transform: none; }
+.stage[data-frameless="tabs"]:is([data-layout="classic"], [data-layout="dynamic"]) .page { transform: none; }
+.stage[data-frameless="tabs"][data-layout="vertical"] .side { opacity: 0; transform: translateX(-12px); }
+.stage[data-frameless="tabs"][data-layout="vertical"] .page { transform: none; }
+
+/* ==========================================================================
+   Layout picker: segmented control with a highlight that slides
+   ========================================================================== */
+.seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0;
+  padding: 4px;
+  border: none;
+  border-radius: 12px;
+  background: var(--surface);
+}
+.seg legend { position: absolute; clip-path: inset(50%); }
+
+.indicator {
+  position: absolute;
+  top: 4px; bottom: 4px; left: 4px;
+  width: calc((100% - 8px) / 4);
+  border-radius: 9px;
+  background: var(--bg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .18), 0 0 0 1px var(--border);
+  transition: transform var(--morph) var(--ease-in-out);
+}
+.seg:has(input[value="dynamic"]:checked)  .indicator { transform: translateX(100%); }
+.seg:has(input[value="compact"]:checked)  .indicator { transform: translateX(200%); }
+.seg:has(input[value="vertical"]:checked) .indicator { transform: translateX(300%); }
+
+.seg label {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0 7px;
+  border-radius: 9px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--quick) ease;
+}
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg svg { width: 22px; height: 16px; transition: transform var(--quick) var(--ease-out); }
+.seg span { font-size: 12px; }
+.seg label:has(input:checked) { color: var(--accent); }
+.seg label:has(input:checked) svg { transform: translateY(-1px); }
+.seg label:active svg { transform: scale(0.94); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+@media (hover: hover) and (pointer: fine) {
+  .seg label:hover:not(:has(input:checked)) { color: var(--text); }
+}
+
+/* ==========================================================================
+   Sections that open and close (grid rows 0fr <-> 1fr)
+   ========================================================================== */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 240ms var(--ease-out),
+    opacity var(--quick) ease;
+}
+.reveal > div { min-height: 0; overflow: hidden; }
+.reveal.open { grid-template-rows: 1fr; opacity: 1; }
+
+.note {
+  display: flex;
+  gap: 8px;
+  margin: 8px 2px 0;
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: 12px;
+}
+.note svg { width: 15px; height: 15px; flex: none; margin-top: 1px; color: var(--accent); }
+
+/* ==========================================================================
+   Toggle rows
+   ========================================================================== */
+.toggles { padding: 0 12px; }
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
   cursor: pointer;
 }
+.reveal .row { border-top: 1px solid var(--border); }
+.row.nested { padding-inline-start: 14px; }
 
-.modes input:checked + span {
-  background: Canvas;
-  color: var(--accent);
-  font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-}
-
-.modes input:focus-visible + span {
-  outline: 2px solid var(--accent);
-}
-
-.hint {
-  margin: 10px 0 0;
+.row .icon {
+  width: 18px; height: 18px;
+  flex: none;
   color: var(--muted);
-  line-height: 1.5;
+  transition: color var(--quick) ease, transform var(--quick) var(--ease-out);
 }
+.row:has(input:checked) .icon { color: var(--accent); }
+
+.text { flex: 1; }
+.title { display: block; }
+.sub { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+
+/* Switch: the thumb glides over and stretches a little while pressed */
+.switch { flex: none; }
+.switch input { position: absolute; opacity: 0; pointer-events: none; }
+.switch .track {
+  position: relative;
+  display: block;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+  transition: background-color var(--quick) ease, box-shadow var(--quick) ease;
+}
+.switch .track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--muted);
+  transform-origin: left center;
+  transition: transform var(--quick) var(--ease-out), background-color var(--quick) ease;
+}
+.switch input:checked + .track { background: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.switch input:checked + .track::after { transform: translateX(16px); transform-origin: right center; background: var(--on-accent); }
+.row:active .switch .track::after { transform: scaleX(1.25); }
+.row:active .switch input:checked + .track::after { transform: translateX(16px) scaleX(1.25); }
+.switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ==========================================================================
+   Footer, setup, compatibility
+   ========================================================================== */
+.hint { color: var(--muted); line-height: 1.5; padding-inline: 2px; }
 
 kbd {
   font: inherit;
-  padding: 1px 5px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: CanvasText;
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--surface);
+  box-shadow: inset 0 -1px 0 var(--border), 0 0 0 1px var(--border);
+  color: var(--text);
 }
 
 button {
   font: inherit;
   padding: 4px 10px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--surface);
-  color: CanvasText;
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: var(--accent);
-}
-
-button.link {
-  padding: 0;
   border: none;
-  background: none;
-  color: var(--accent);
-  text-decoration: underline;
+  border-radius: 7px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--quick) ease, transform 120ms var(--ease-out);
 }
+button:active { transform: scale(0.97); }
+@media (hover: hover) and (pointer: fine) {
+  button:hover { background: color-mix(in srgb, var(--accent) 18%, var(--surface-2)); }
+}
+button.link { padding: 0; background: none; color: var(--accent); text-decoration: underline; }
 
-/* Setup warning */
 #setup {
-  margin-top: 14px;
-  padding: 10px;
-  border: 1px solid #d70022;
-  border-radius: 8px;
-  background: light-dark(#fff1f2, #3a1e22);
+  padding: 12px;
+  border-radius: 12px;
+  background: light-dark(#fff1f2, #341c1f);
+  box-shadow: inset 0 0 0 1px light-dark(#f3b8be, #6a2a31);
 }
+#setup h2 svg { color: light-dark(#c0182b, #ff7b86); }
+#setup p { margin: 0 0 8px; line-height: 1.4; }
 
-#setup p {
-  margin: 0 0 8px;
-  line-height: 1.4;
-}
-
-.command {
-  display: flex;
-  gap: 6px;
-  align-items: flex-start;
-}
-
+.command { display: flex; gap: 6px; align-items: flex-start; }
 .command code {
   flex: 1;
   padding: 6px;
-  border-radius: 6px;
-  background: Canvas;
+  border-radius: 7px;
+  background: var(--bg);
   font-size: 11px;
   word-break: break-all;
 }
 
-details {
-  margin-top: 10px;
-}
-
+details { margin-top: 10px; }
 summary {
   cursor: pointer;
   color: var(--muted);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--quick) ease;
 }
-
-ol {
-  margin: 8px 0;
-  padding-left: 18px;
-  line-height: 1.45;
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-right: 1.4px solid currentColor;
+  border-bottom: 1.4px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--quick) var(--ease-out);
 }
+details[open] > summary::before { transform: rotate(45deg); }
+@media (hover: hover) and (pointer: fine) { summary:hover { color: var(--text); } }
+details[open] > :not(summary) { animation: rise 220ms var(--ease-out) both; }
 
-ol code {
-  font-size: 11px;
-  word-break: break-all;
+.compat { font-size: 12px; color: var(--muted); padding-inline: 2px; }
+.compat p, .compat ul { margin: 8px 0 0; line-height: 1.45; }
+.compat ul { padding-left: 16px; }
+.compat li + li { margin-top: 4px; }
+.compat a { color: var(--accent); }
+code { font-size: 11px; word-break: break-word; }
+
+ol { margin: 8px 0; padding-left: 18px; line-height: 1.45; }
+ol code { word-break: break-all; }
+
+/* The popup opens in its saved state without playing the transitions */
+.no-motion *, .no-motion *::after, .no-motion *::before { transition: none !important; }
+
+/* ==========================================================================
+   Reduced motion: keep the fades, drop the movement
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .enter, details[open] > :not(summary) { animation: fade 180ms ease both; }
+  @keyframes fade { from { opacity: 0; } }
+  .win > div, .indicator, .seg svg, .switch .track::after, .reveal, .bar .url, button {
+    transition-property: opacity, background-color, color;
+    transition-duration: 150ms;
+  }
+  .row:active .switch .track::after { transform: none; }
+  .row:active .switch input:checked + .track::after { transform: translateX(16px); }
 }
