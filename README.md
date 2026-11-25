@@ -1,6 +1,6 @@
 # Firefox Compact
 
-Frameless mode for Firefox, like Helium's and Zen's. Hide the toolbars and bring them back by hovering the top of the window. Toggle it with **Ctrl+Alt+C**. With the [HeliumFox](https://github.com/rs4t/heliumfox) theme, it also switches between Helium's layouts.
+Frameless mode for Firefox, like Helium's and Zen's. Hide the toolbars and bring them back by hovering the top of the window. Toggle it with **Ctrl+Alt+C**. With the [Argon](https://github.com/rs4t/argon-firefox) theme, it also switches between Helium-style layouts.
 
 Works with any theme: it only hides and reveals the toolbars, it never changes their colors.
 
@@ -59,18 +59,18 @@ Click the extension icon to open its settings:
 - The toolbars also stay visible while you type in the URL bar (Ctrl+L, Ctrl+T), while a menu is open, and while you drag a tab.
 - **With vertical tabs**, frameless mode hides the tab sidebar too. Hover the edge it sits on to slide it back.
 
-### Layouts (with HeliumFox)
+### Layouts (with Argon)
 
-With the [HeliumFox](https://github.com/rs4t/heliumfox) theme installed, the popup also shows Helium's layout picker:
+With the [Argon](https://github.com/rs4t/argon-firefox) theme installed, the popup also shows a Helium-style layout picker:
 
 | Layout | What it does |
 | --- | --- |
 | **Classic** | Tab row on top, toolbar below |
 | **Dynamic** | Toolbar on top. The tab row only appears with 2 or more tabs |
 | **Compact** | Everything in one row: URL bar, tabs, `+`, extensions, menu |
-| **Vertical** | Uses Firefox's own vertical tabs (Settings → General → Browser layout). HeliumFox styles them |
+| **Vertical** | Uses Firefox's own vertical tabs (Settings → General → Browser layout). Argon styles them |
 
-The picker only appears when HeliumFox is installed, so with any other theme the extension stays a plain frameless-mode toggle.
+The picker only appears when Argon is installed, so with any other theme the extension stays a plain frameless-mode toggle.
 
 ## Theme compatibility
 
@@ -89,7 +89,7 @@ Also keep `@import "compact.css";` as the **first** line of `userChrome.css` and
 - The setup check reads the import line in `userContent.css`. If a theme replaces only `userChrome.css`, the extension can't tell.
 - Firefox's fullscreen and the Customize screen ignore compact mode.
 
-Made to pair with [HeliumFox](https://github.com/rs4t/heliumfox) and [Latin Accent Plus](https://github.com/rs4t/latin-accent-plus), but it works with any theme.
+Made to pair with [Argon](https://github.com/rs4t/argon-firefox) and [Latin Accent Plus](https://github.com/rs4t/latin-accent-plus), but it works with any theme.
 
 ## License
 

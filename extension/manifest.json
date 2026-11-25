@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Compact Mode",
-  "version": "0.2.0",
-  "description": "Frameless mode for Firefox: hide the toolbars until you hover the top of the window. With the HeliumFox theme, also picks Helium's layouts (Classic, Dynamic, Compact, Vertical).",
+  "version": "0.2.1",
+  "description": "Frameless mode for Firefox: hide the toolbars until you hover the top of the window. With the Argon theme, also picks Helium-style layouts (Classic, Dynamic, Compact, Vertical).",
   "browser_specific_settings": {
     "gecko": {
       "id": "compact-mode@rs4t",

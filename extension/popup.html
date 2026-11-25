@@ -5,9 +5,10 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <!-- compact.css / heliumfox-content.css style these when they're installed -->
+  <!-- compact.css / argon-content.css style these when they're installed -->
   <div id="compact-mode-probe" hidden></div>
-  <div id="heliumfox-probe" hidden></div>
+  <div id="argon-probe" hidden></div>
+  <div id="heliumfox-probe" hidden></div><!-- Argon's old name -->
 
   <!-- Live preview: morphs to show the chosen layout and frameless mode -->
   <div class="stage enter" id="stage" data-layout="classic" aria-hidden="true">
@@ -20,7 +21,7 @@
     </div>
   </div>
 
-  <!-- Layout picker: only shown when the HeliumFox theme is installed -->
+  <!-- Layout picker: only shown when the Argon theme is installed -->
   <section id="layout-section" class="enter" hidden>
     <h2>Layout</h2>
     <fieldset class="seg">
@@ -51,7 +52,7 @@
       <div>
         <p class="note">
           <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v4M8 4.8v.1"/></svg>
-          <span>Vertical tabs are a Firefox setting: <b>Settings → General → Browser layout → Vertical tabs</b>. HeliumFox styles them automatically.</span>
+          <span>Vertical tabs are a Firefox setting: <b>Settings → General → Browser layout → Vertical tabs</b>. Argon styles them automatically.</span>
         </p>
       </div>
     </div>
@@ -119,7 +120,7 @@
       <li><code>position</code> or <code>transform</code> on <code>#navigator-toolbox</code> (themes with their own auto-hiding or floating toolbars)</li>
       <li><code>position</code> on <code>#sidebar-container</code> (vertical tabs)</li>
     </ul>
-    <p>Also make sure <code>@import "compact.css";</code> is the <b>first</b> line of <code>userChrome.css</code>. The layout picker only appears with the <a href="https://github.com/rs4t/heliumfox" target="_blank">HeliumFox</a> theme.</p>
+    <p>Also make sure <code>@import "compact.css";</code> is the <b>first</b> line of <code>userChrome.css</code>. The layout picker only appears with the <a href="https://github.com/rs4t/argon-firefox" target="_blank">Argon</a> theme.</p>
   </details>
 
   <script src="popup.js"></script>

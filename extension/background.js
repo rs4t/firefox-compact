@@ -1,17 +1,17 @@
 // Invisible characters put in each window's title preface. The CSS reads
 // them from the titlepreface attribute Firefox sets on the window's root.
 //   compact.css   reads the frameless markers (works with any theme)
-//   heliumfox.css reads the layout markers (HeliumFox theme only)
+//   argon.css reads the layout markers (Argon theme only)
 const MARKERS = {
   tabs: "⁣",
   urlbar: "⁤",
   both: "⁣⁤",
 };
 const LAYOUTS = {
-  dynamic: "",          // HeliumFox default, no marker
+  dynamic: "",          // Argon's default, no marker
   classic: "⁡",
   compact: "⁢",
-  vertical: "",         // Firefox's own vertical tabs; HeliumFox styles them
+  vertical: "",         // Firefox's own vertical tabs; Argon styles them
 };
 
 const DEFAULTS = { enabled: false, mode: "both", layout: "dynamic" };

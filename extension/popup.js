@@ -27,11 +27,11 @@ async function showShortcut() {
 }
 
 // Mirror the current settings in the live preview and the open/closed sections.
-function render(heliumfox) {
+function render(argon) {
   const frameless = $("enabled").checked;
   const checked = document.querySelector('input[name="layout"]:checked');
-  // Without HeliumFox, Firefox's own layout is tabs on top, toolbar below.
-  const layout = heliumfox && checked ? checked.value : "classic";
+  // Without Argon, Firefox's own layout is tabs on top, toolbar below.
+  const layout = argon && checked ? checked.value : "classic";
 
   const stage = $("stage");
   stage.dataset.layout = layout;
@@ -39,40 +39,41 @@ function render(heliumfox) {
   else delete stage.dataset.frameless;
 
   $("top-reveal").classList.toggle("open", frameless);
-  $("vertical-hint").classList.toggle("open", heliumfox && layout === "vertical");
+  $("vertical-hint").classList.toggle("open", argon && layout === "vertical");
 }
 
 async function init() {
   const state = await browser.storage.local.get(DEFAULTS);
-  const heliumfox = probeSet("heliumfox-probe", "--heliumfox-css");
+  // Argon, or an install from when it was still called HeliumFox
+  const argon = probeSet("argon-probe", "--argon-css") || probeSet("heliumfox-probe", "--heliumfox-css");
 
   // Frameless mode = hide everything; "Always show the top bar" = only the tabs hide.
   $("enabled").checked = state.enabled;
   $("always-top").checked = state.mode === "tabs";
   $("enabled").addEventListener("change", (e) => {
     browser.storage.local.set({ enabled: e.target.checked });
-    render(heliumfox);
+    render(argon);
   });
   $("always-top").addEventListener("change", (e) => {
     browser.storage.local.set({ mode: e.target.checked ? "tabs" : "both" });
-    render(heliumfox);
+    render(argon);
   });
 
-  // Layout picker, only with the HeliumFox theme.
-  if (heliumfox) {
+  // Layout picker, only with the Argon theme.
+  if (argon) {
     $("layout-section").hidden = false;
     for (const radio of document.querySelectorAll('input[name="layout"]')) {
       radio.checked = radio.value === state.layout;
       radio.addEventListener("change", () => {
         browser.storage.local.set({ layout: radio.value });
-        render(heliumfox);
+        render(argon);
       });
     }
   }
 
   // First paint without transitions, so the popup opens in its current state.
   document.documentElement.classList.add("no-motion");
-  render(heliumfox);
+  render(argon);
   requestAnimationFrame(() => requestAnimationFrame(() =>
     document.documentElement.classList.remove("no-motion")));
 
